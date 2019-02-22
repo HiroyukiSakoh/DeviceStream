@@ -2,11 +2,12 @@
   "profiles": {
     "DeviceStreamSample": {
       "commandName": "Project",
-        "environmentVariables": {
-            "IOTHUB_CONN_STRING_CSHARP": "<yourIoTHubConnectionString>",
-            "DEVICE_ID": "<deviceId>",
-            "LOCAL_PORT":  "<localPortOpenedByTheSample>"
-        }
+      "environmentVariables": {
+        "IOTHUB_CONN_STRING_CSHARP": "<yourIoTHubConnectionString>",
+        "DEVICE_ID": "<deviceId>",
+        "LOCAL_PORT": "<localPortOpenedByTheSample>",
+        "PROXY_ADDRESS": "localhost:8888"
+      }
     }
   }
 }

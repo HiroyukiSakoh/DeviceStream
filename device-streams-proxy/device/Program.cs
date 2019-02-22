@@ -3,6 +3,7 @@
 
 using System;
 using System.Globalization;
+using System.Net;
 
 namespace Microsoft.Azure.Devices.Client.Samples
 {
@@ -31,10 +32,12 @@ namespace Microsoft.Azure.Devices.Client.Samples
         private static string s_port = Environment.GetEnvironmentVariable("REMOTE_PORT");
 
         // Select one of the following transports used by DeviceClient to connect to IoT Hub.
-        private static TransportType s_transportType = TransportType.Amqp;
+        //private static TransportType s_transportType = TransportType.Amqp;
         //private static TransportType s_transportType = TransportType.Mqtt;
-        //private static TransportType s_transportType = TransportType.Amqp_WebSocket_Only;
+        private static TransportType s_transportType = TransportType.Amqp_WebSocket_Only;
         //private static TransportType s_transportType = TransportType.Mqtt_WebSocket_Only;
+
+        private static string s_proxyAddress = Environment.GetEnvironmentVariable("PROXY_ADDRESS");
 
         public static int Main(string[] args)
         {
@@ -67,7 +70,13 @@ namespace Microsoft.Azure.Devices.Client.Samples
 
             int port = int.Parse(s_port, CultureInfo.InvariantCulture);
 
-            using (DeviceClient deviceClient = DeviceClient.CreateFromConnectionString(s_deviceConnectionString, s_transportType))
+            using (DeviceClient deviceClient = DeviceClient.CreateFromConnectionString(s_deviceConnectionString
+                , new ITransportSettings[] {
+                    new AmqpTransportSettings(s_transportType){
+                        Proxy = new WebProxy(s_proxyAddress)
+                    }
+                }
+            ))
             {
                 if (deviceClient == null)
                 {

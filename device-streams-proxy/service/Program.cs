@@ -3,6 +3,9 @@
 
 using System;
 using System.Globalization;
+using System.Net;
+using System.Net.Http;
+using System.Reflection;
 
 namespace Microsoft.Azure.Devices.Samples
 {
@@ -29,8 +32,10 @@ namespace Microsoft.Azure.Devices.Samples
         private static string s_port = Environment.GetEnvironmentVariable("LOCAL_PORT");
 
         // Select one of the following transports used by ServiceClient to connect to IoT Hub.
-        private static TransportType s_transportType = TransportType.Amqp;
-        //private static TransportType s_transportType = TransportType.Amqp_WebSocket_Only;
+        //private static TransportType s_transportType = TransportType.Amqp;
+        private static TransportType s_transportType = TransportType.Amqp_WebSocket_Only;
+
+        private static string s_proxyAddress = Environment.GetEnvironmentVariable("PROXY_ADDRESS");
 
         public static int Main(string[] args)
         {
@@ -63,7 +68,13 @@ namespace Microsoft.Azure.Devices.Samples
 
             int port = int.Parse(s_port, CultureInfo.InvariantCulture);
 
-            using (ServiceClient serviceClient = ServiceClient.CreateFromConnectionString(s_connectionString, s_transportType))
+            ServiceClientTransportSettings transportSettings = new ServiceClientTransportSettings
+            {
+                AmqpProxy = new WebProxy(s_proxyAddress),
+                HttpProxy = new WebProxy(s_proxyAddress),
+            };
+
+            using (ServiceClient serviceClient = ServiceClient.CreateFromConnectionString(s_connectionString, s_transportType, transportSettings))
             {
                 var sample = new DeviceStreamSample(serviceClient, s_deviceId, port);
                 sample.RunSampleAsync().GetAwaiter().GetResult();
