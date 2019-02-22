@@ -76,6 +76,18 @@ namespace Microsoft.Azure.Devices.Samples
 
             using (ServiceClient serviceClient = ServiceClient.CreateFromConnectionString(s_connectionString, s_transportType, transportSettings))
             {
+                //replace proxy
+                var httpClientHelper = serviceClient.GetType().GetField("httpClientHelper", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(serviceClient);
+
+                var srcHttpClient = httpClientHelper.GetType().GetField("httpClientObj", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(httpClientHelper) as HttpClient;
+                var destHttpClient = httpClientHelper.GetType().GetField("httpClientObjWithPerRequestTimeout", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(httpClientHelper) as HttpClient;
+
+                var field_HttpMessageInvoker = typeof(HttpMessageInvoker).GetField("_handler", BindingFlags.NonPublic | BindingFlags.Instance);
+                var srcHttpClientHandler = field_HttpMessageInvoker.GetValue(srcHttpClient) as HttpClientHandler;
+                var destHttpClientHandler = field_HttpMessageInvoker.GetValue(destHttpClient) as HttpClientHandler;
+
+                destHttpClientHandler.Proxy = srcHttpClientHandler.Proxy;
+
                 var sample = new DeviceStreamSample(serviceClient, s_deviceId, port);
                 sample.RunSampleAsync().GetAwaiter().GetResult();
             }
