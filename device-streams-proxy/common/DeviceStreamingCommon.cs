@@ -25,6 +25,7 @@ namespace Microsoft.Azure.Devices.Samples.Common
             ClientWebSocket wsClient = new ClientWebSocket();
             wsClient.Options.SetRequestHeader("Authorization", "Bearer " + authorizationToken);
             wsClient.Options.Proxy = new WebProxy(s_proxyAddress);
+            Console.WriteLine($"connect to:{url.ToString()}");
             await wsClient.ConnectAsync(url, cancellationToken).ConfigureAwait(false);
 
             return wsClient;
