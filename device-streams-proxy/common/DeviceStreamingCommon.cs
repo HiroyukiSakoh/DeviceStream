@@ -2,6 +2,7 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
+using System.Net;
 using System.Net.WebSockets;
 using System.Threading;
 using System.Threading.Tasks;
@@ -10,6 +11,8 @@ namespace Microsoft.Azure.Devices.Samples.Common
 {
     public static class DeviceStreamingCommon
     {
+
+        private static string s_proxyAddress = Environment.GetEnvironmentVariable("PROXY_ADDRESS");
         /// <summary>
         /// Creates a ClientWebSocket with the proper authorization header for Device Streaming.
         /// </summary>
@@ -21,7 +24,7 @@ namespace Microsoft.Azure.Devices.Samples.Common
         {
             ClientWebSocket wsClient = new ClientWebSocket();
             wsClient.Options.SetRequestHeader("Authorization", "Bearer " + authorizationToken);
-
+            wsClient.Options.Proxy = new WebProxy(s_proxyAddress);
             await wsClient.ConnectAsync(url, cancellationToken).ConfigureAwait(false);
 
             return wsClient;
